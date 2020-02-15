@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/guilherme-argentino/video-maker-enhanced/issues"
   },
-  "homepage": "https://github.com/guilherme-argentino/video-maker-enhanced#readme"
+  "homepage": "https://github.com/guilherme-argentino/video-maker-enhanced#readme",
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  }
 }
