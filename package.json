@@ -18,6 +18,8 @@
   "homepage": "https://github.com/guilherme-argentino/video-maker-enhanced#readme",
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "googleapis": "^47.0.0",
+    "image-downloader": "^3.5.0",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.16",
     "watson-developer-cloud": "^4.0.1"
