@@ -103,6 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
+.jshintrc
 
 # credentials
 credentials/*.json
@@ -111,3 +112,10 @@ content.json
 
 content/*.png
 content/*.jpg
+content/*.js
+content/*.mov
+video.mp4
+
+Adobe After Effects Auto-Save
+template.aep Logs
+.DS_Store
