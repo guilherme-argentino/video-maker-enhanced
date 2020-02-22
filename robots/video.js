@@ -64,7 +64,7 @@ async function robot() {
                         return reject(error)
                     }
 
-                    console.log(`> Image converted: ${inputFile}`)
+                    console.log(`> [video-robot] Image converted: ${inputFile}`)
                     resolve()
                 })
         });
@@ -130,7 +130,7 @@ async function robot() {
                         return reject(error)
                     }
 
-                    console.log(`> Sentence created: ${outputFile}`)
+                    console.log(`> [video-robot] Sentence created: ${outputFile}`)
                     resolve()
                 })
         })
@@ -145,7 +145,7 @@ async function robot() {
                         return reject(error)
                     }
 
-                    console.log("> Creating YouTube thumbnail")
+                    console.log("> [video-robot] Creating YouTube thumbnail")
                     resolve()
                 })
         })
@@ -162,7 +162,7 @@ async function robot() {
             const templateFilePath = `${rootPath}/templates/1/template.aep`;
             const destinationFilePath = `${rootPath}/content/output.mov`;
 
-            console.log("> Starting After Effects")
+            console.log("> [video-robot] Starting After Effects")
 
             const aerender = spawn(aerenderFilePath, [
                 "-comp",
@@ -178,7 +178,7 @@ async function robot() {
             })
 
             aerender.on("close", () => {
-                console.log("> After Effects closed")
+                console.log("> [video-robot] After Effects closed")
                 resolve()
             })
         })
@@ -235,14 +235,14 @@ async function robot() {
                 // .audio("song.mp3")
                 .save("video.mp4")
                 .on("start", function (command) {
-                    console.log("ffmpeg process started:", command);
+                    console.log("> [video-robot] ffmpeg process started ... "); //, command);
                 })
                 .on("error", function (err, stdout, stderr) {
-                    console.error("Error:", err);
-                    console.error("ffmpeg stderr:", stderr);
+                    console.error("> [video-robot] Error:", err);
+                    console.error("> [video-robot] ffmpeg stderr:", stderr);
                 })
                 .on("end", function (output) {
-                    console.error("Video created in:", output);
+                    console.error("> [video-robot] Video created in:", output);
                     resolve()
                 })
         })
