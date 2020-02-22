@@ -179,6 +179,7 @@ async function robot() {
 
             aerender.on("close", () => {
                 console.log("> [video-robot] After Effects closed")
+                content.videoFilePath = destinationFilePath
                 resolve()
             })
         })
@@ -186,6 +187,8 @@ async function robot() {
 
     async function renderVideoWithNode() {
         return new Promise((resolve, reject) => {
+            const destinationFilePath = `${rootPath}/content/output.mp4`;
+
             let images = []
 
             for (
@@ -232,17 +235,19 @@ async function robot() {
             }
 
             videoshow(images, videoOptions)
-                // .audio("song.mp3")
-                .save("video.mp4")
+                .audio("./templates/1/newsroom.mp3")
+                .save(destinationFilePath)
                 .on("start", function (command) {
                     console.log("> [video-robot] ffmpeg process started ... "); //, command);
                 })
                 .on("error", function (err, stdout, stderr) {
                     console.error("> [video-robot] Error:", err);
                     console.error("> [video-robot] ffmpeg stderr:", stderr);
+                    reject(err);
                 })
                 .on("end", function (output) {
                     console.error("> [video-robot] Video created in:", output);
+                    content.videoFilePath = destinationFilePath
                     resolve()
                 })
         })
