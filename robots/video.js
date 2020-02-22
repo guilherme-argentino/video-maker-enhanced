@@ -11,13 +11,14 @@ ffmpeg.setFfmpegPath(ffmpegPath)
 ffmpeg.setFfprobePath(ffprobePath)
 
 async function robot() {
+    console.log('> [video-robot] Starting...')
     const content = state.load()
 
     await convertAllImages(content)
     await createAllSentenceImages(content)
     await createYouTubeThumbnail()
     await createAfterEffectsScript(content)
-    await renderVideo("node", content)
+    await renderVideo("node")
 
     state.save(content)
 
@@ -183,72 +184,75 @@ async function robot() {
         })
     }
 
-    async function renderVideoWithNode(content) {
-        let images = []
+    async function renderVideoWithNode() {
+        return new Promise((resolve, reject) => {
+            let images = []
 
-        for (
-            let sentenceIndex = 0;
-            sentenceIndex < content.sentences.length;
-            sentenceIndex++
-        ) {
-            images.push({
-                path: `./content/${sentenceIndex}-converted.png`,
-                caption: content.sentences[sentenceIndex].text
-            })
-        }
-
-        const videoOptions = {
-            fps: 25,
-            loop: 5, // seconds
-            transition: true,
-            transitionDuration: 1, // seconds
-            videoBitrate: 1024,
-            videoCodec: "libx264",
-            size: "640x?",
-            audioBitrate: "128k",
-            audioChannels: 2,
-            format: "mp4",
-            pixelFormat: "yuv420p",
-            useSubRipSubtitles: false, // Use ASS/SSA subtitles instead
-            subtitleStyle: {
-                Fontname: "Verdana",
-                Fontsize: "26",
-                PrimaryColour: "11861244",
-                SecondaryColour: "11861244",
-                TertiaryColour: "11861244",
-                BackColour: "-2147483640",
-                Bold: "2",
-                Italic: "0",
-                BorderStyle: "2",
-                Outline: "2",
-                Shadow: "3",
-                Alignment: "1", // left, middle, right
-                MarginL: "40",
-                MarginR: "60",
-                MarginV: "40"
+            for (
+                let sentenceIndex = 0;
+                sentenceIndex < content.sentences.length;
+                sentenceIndex++
+            ) {
+                images.push({
+                    path: `./content/${sentenceIndex}-converted.png`,
+                    caption: content.sentences[sentenceIndex].text
+                })
             }
-        }
 
-        videoshow(images, videoOptions)
-            // .audio("song.mp3")
-            .save("video.mp4")
-            .on("start", function (command) {
-                console.log("ffmpeg process started:", command);
-            })
-            .on("error", function (err, stdout, stderr) {
-                console.error("Error:", err);
-                console.error("ffmpeg stderr:", stderr);
-            })
-            .on("end", function (output) {
-                console.error("Video created in:", output);
-            })
+            const videoOptions = {
+                fps: 25,
+                loop: 5, // seconds
+                transition: true,
+                transitionDuration: 1, // seconds
+                videoBitrate: 1024,
+                videoCodec: "libx264",
+                size: "640x?",
+                audioBitrate: "128k",
+                audioChannels: 2,
+                format: "mp4",
+                pixelFormat: "yuv420p",
+                useSubRipSubtitles: false, // Use ASS/SSA subtitles instead
+                subtitleStyle: {
+                    Fontname: "Verdana",
+                    Fontsize: "26",
+                    PrimaryColour: "11861244",
+                    SecondaryColour: "11861244",
+                    TertiaryColour: "11861244",
+                    BackColour: "-2147483640",
+                    Bold: "2",
+                    Italic: "0",
+                    BorderStyle: "2",
+                    Outline: "2",
+                    Shadow: "3",
+                    Alignment: "1", // left, middle, right
+                    MarginL: "40",
+                    MarginR: "60",
+                    MarginV: "40"
+                }
+            }
+
+            videoshow(images, videoOptions)
+                // .audio("song.mp3")
+                .save("video.mp4")
+                .on("start", function (command) {
+                    console.log("ffmpeg process started:", command);
+                })
+                .on("error", function (err, stdout, stderr) {
+                    console.error("Error:", err);
+                    console.error("ffmpeg stderr:", stderr);
+                })
+                .on("end", function (output) {
+                    console.error("Video created in:", output);
+                    resolve()
+                })
+        })
     }
 
-    async function renderVideo(type, content) {
+    async function renderVideo(type) {
         if (type == "after") {
             await renderVideoWithAfterEffects();
         } else {
-            await renderVideoWithNode(content);
+            await renderVideoWithNode();
         }
     }
 }
