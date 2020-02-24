@@ -6,7 +6,7 @@ Primeiro você precisa instalar em sua máquina o [NodeJS](https://nodejs.org/en
 
 ```bash
 $ git clone https://github.com/guilherme-argentino/video-maker-enhanced.git
-$ cd video-maker
+$ cd video-maker-enhanced
 $ npm install
 $ node index.js
 ```
