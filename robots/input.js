@@ -23,6 +23,7 @@ async function robot() {
       content.searchTerm = askAndReturnSearchTerm();
   }
   content.prefix = askAndReturnPrefix();
+  content.lang = askAndReturnLanguage();
   state.save(content);
 
   function askSearchTermSource() {
@@ -69,6 +70,16 @@ async function robot() {
     const parser = new Parser();
     const trends = await parser.parseURL(TREND_URL);
     return trends.items.map(({ title }) => title);
+  }
+
+  function askAndReturnLanguage() {
+    const language = ["pt", "en"];
+    const selectedLangIndex = readline.keyInSelect(
+      language,
+      "Choice Language: "
+    );
+    const selectedLangText = language[selectedLangIndex];
+    return selectedLangText;
   }
 }
 
