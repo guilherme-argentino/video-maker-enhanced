@@ -4,7 +4,7 @@
   "description": "Passo-a-passo de criação da playlist https://www.youtube.com/playlist?list=PLMdYygf53DP4YTVeu0JxVnWq01uXrLwHi com aplicação de técnicas adicionais de desenvolvimento e ajustes na arquitetura para escala.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,14 @@
     "gm": "^1.23.1",
     "googleapis": "^47.0.0",
     "image-downloader": "^3.5.0",
+    "jest": "^25.1.0",
     "readline-sync": "^1.4.10",
     "rss-parser": "^3.7.5",
     "sbd": "^1.0.16",
     "videoshow": "^0.1.12",
     "watson-developer-cloud": "^4.0.1"
+  },
+  "devDependencies": {
+    "test": ">=0.0.5"
   }
 }
