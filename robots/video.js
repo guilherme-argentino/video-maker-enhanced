@@ -198,20 +198,23 @@ async function robot() {
                 sentenceIndex < content.sentences.length;
                 sentenceIndex++
             ) {
+                const slideTransition = content.sentences[sentenceIndex].wordcount.total * 0.6 // Leitura de 100 palavras por minuto
+                console.log(`>[video-robot] DEBUG: loop: ${slideTransition}`)
                 images.push({
                     path: `./content/${sentenceIndex}-converted.png`,
-                    caption: content.sentences[sentenceIndex].text
+                    caption: content.sentences[sentenceIndex].text,
+                    loop: slideTransition // loop variável de acordo com o tamanho das palavras
                 })
             }
 
             const videoOptions = {
                 fps: 25,
-                loop: 5, // seconds
+                loop: 10, // seconds
                 transition: true,
                 transitionDuration: 1, // seconds
                 videoBitrate: 1024,
                 videoCodec: "libx264",
-                size: "640x?",
+                size: "800x?",
                 audioBitrate: "128k",
                 audioChannels: 2,
                 format: "mp4",
