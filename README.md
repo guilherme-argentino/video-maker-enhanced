@@ -27,8 +27,6 @@ cd video-maker-enhanced
 npm install
 ```
 
-![Clone](https://i.imgsafe.org/ca/caed010086.gif)
-
 ## Api: Algorithmia ##
 É necessário criar a sua chave de acesso para poder testar os robôs, pra isso você precisa acessar o site do [Algorithmia](https://algorithmia.com/), aqui não tem muito segredo, basta acessar e se cadastrar, depois de logar na sua conta, na Dashboard procure no menu **Api Keys** e **copie**.
 
