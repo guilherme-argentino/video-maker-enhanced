@@ -4,7 +4,8 @@
   "description": "Passo-a-passo de criação da playlist https://www.youtube.com/playlist?list=PLMdYygf53DP4YTVeu0JxVnWq01uXrLwHi com aplicação de técnicas adicionais de desenvolvimento e ajustes na arquitetura para escala.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node ."
   },
   "repository": {
     "type": "git",
