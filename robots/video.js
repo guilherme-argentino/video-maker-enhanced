@@ -37,7 +37,7 @@ async function robot() {
 
     async function convertImage(sentenceIndex) {
         return new Promise((resolve, reject) => {
-            const inputFile = fromRoot(`./content/${sentenceIndex}-original.png`);
+            const inputFile = fromRoot(`./content/${sentenceIndex}-original.png[0]`);
             const outputFile = fromRoot(`./content/${sentenceIndex}-converted.png`);
             const width = 1920;
             const height = 1080;
