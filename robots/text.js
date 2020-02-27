@@ -74,6 +74,7 @@ async function robot() {
     sentences.forEach(sentence => {
       content.sentences.push({
         text: sentence,
+        wordcount: countWords(sentence),
         keywords: [],
         images: []
       });
@@ -94,6 +95,28 @@ async function robot() {
 
       console.log(`> [text-robot] Keywords: ${sentence.keywords.join(", ")}\n`);
     }
+  }
+
+  function countWords(sentence) {
+    var index = {
+      total: 0,
+      words: []
+    },
+      words = sentence
+        .replace(/[.,?!;()"'-]/g, " ")
+        .replace(/\s+/g, " ")
+        .toLowerCase()
+        .split(" ");
+
+    words.forEach(function (word) {
+      if (!(index.words.hasOwnProperty(word))) {
+        index.words[word] = 0;
+      }
+      index.words[word]++;
+      index.total++;
+    });
+
+    return index;
   }
 
   async function fetchWatsonAndReturnKeywords(sentence) {
