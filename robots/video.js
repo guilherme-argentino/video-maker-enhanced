@@ -1,26 +1,29 @@
-const gm = require("gm").subClass({ imageMagick: true })
-const state = require("./state.js")
-const spawn = require("child_process").spawn
-const path = require("path")
-const rootPath = path.resolve(__dirname, "..")
-const videoshow = require('videoshow')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
-const ffprobePath = require('@ffprobe-installer/ffprobe').path
-let ffmpeg = require("fluent-ffmpeg")
-ffmpeg.setFfmpegPath(ffmpegPath)
-ffmpeg.setFfprobePath(ffprobePath)
+const gm = require("gm").subClass({ imageMagick: true });
+const state = require("./state.js");
+const spawn = require("child_process").spawn;
+const path = require("path");
+const rootPath = path.resolve(__dirname, "..");
+
+const fromRoot = relPath => path.resolve(rootPath, relPath);
+
+const videoshow = require("videoshow");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const ffprobePath = require("@ffprobe-installer/ffprobe").path;
+let ffmpeg = require("fluent-ffmpeg");
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 async function robot() {
-    console.log('> [video-robot] Starting...')
-    const content = state.load()
+    console.log("> [video-robot] Starting...");
+    const content = state.load();
 
-    await convertAllImages(content)
-    await createAllSentenceImages(content)
-    await createYouTubeThumbnail()
-    await createAfterEffectsScript(content)
-    await renderVideo("node")
+    await convertAllImages(content);
+    await createAllSentenceImages(content);
+    await createYouTubeThumbnail();
+    await createAfterEffectsScript(content);
+    await renderVideo("node");
 
-    state.save(content)
+    state.save(content);
 
     async function convertAllImages(content) {
         for (
@@ -28,16 +31,16 @@ async function robot() {
             sentenceIndex < content.sentences.length;
             sentenceIndex++
         ) {
-            await convertImage(sentenceIndex)
+            await convertImage(sentenceIndex);
         }
     }
 
     async function convertImage(sentenceIndex) {
         return new Promise((resolve, reject) => {
-            const inputFile = `./content/${sentenceIndex}-original.png[0]`
-            const outputFile = `./content/${sentenceIndex}-converted.png`
-            const width = 1920
-            const height = 1080
+            const inputFile = fromRoot(`./content/${sentenceIndex}-original.png[0]`);
+            const outputFile = fromRoot(`./content/${sentenceIndex}-converted.png`);
+            const width = 1920;
+            const height = 1080;
 
             gm()
                 .in(inputFile)
@@ -61,14 +64,14 @@ async function robot() {
                 .out("-extent", `${width}x${height}`)
                 .write(outputFile, error => {
                     if (error) {
-                        console.log(`> [video-robot] Image convertion error: ${inputFile}`)
-                        console.log(`> [video-robot] Error: ${error}`)
-                        return reject(error)
+                        console.log(`> [video-robot] Image convertion error: ${inputFile}`);
+                        console.log(`> [video-robot] Error: ${error}`);
+                        return reject(error);
                     }
 
-                    console.log(`> [video-robot] Image converted: ${inputFile}`)
-                    resolve()
-                })
+                    console.log(`> [video-robot] Image converted: ${inputFile}`);
+                    resolve();
+                });
         });
     }
 
@@ -81,13 +84,13 @@ async function robot() {
             await createSentenceImage(
                 sentenceIndex,
                 content.sentences[sentenceIndex].text
-            )
+            );
         }
     }
 
     async function createSentenceImage(sentenceIndex, sentenceText) {
         return new Promise((resolve, reject) => {
-            const outputFile = `./content/${sentenceIndex}-sentence.png`
+            const outputFile = fromRoot(`./content/${sentenceIndex}-sentence.png`);
 
             const templateSettings = {
                 0: {
@@ -129,42 +132,52 @@ async function robot() {
                 .out(`caption:${sentenceText}`)
                 .write(outputFile, error => {
                     if (error) {
-                        return reject(error)
+                        return reject(error);
                     }
 
-                    console.log(`> [video-robot] Sentence created: ${outputFile}`)
-                    resolve()
-                })
-        })
+                    console.log(`> [video-robot] Sentence created: ${outputFile}`);
+                    resolve();
+                });
+        });
     }
 
     async function createYouTubeThumbnail() {
         return new Promise((resolve, reject) => {
             gm()
-                .in("./content/0-converted.png")
-                .write("./content/youtube-thumbnail.jpg", error => {
+                .in(fromRoot("./content/0-converted.png"))
+                .write(fromRoot("./content/youtube-thumbnail.jpg"), error => {
                     if (error) {
-                        return reject(error)
+                        return reject(error);
                     }
 
-                    console.log("> [video-robot] Creating YouTube thumbnail")
-                    resolve()
-                })
-        })
+                    console.log("> [video-robot] Creating YouTube thumbnail");
+                    resolve();
+                });
+        });
     }
 
     async function createAfterEffectsScript(content) {
-        state.saveScript(content)
+        state.saveScript(content);
     }
 
     async function renderVideoWithAfterEffects() {
         return new Promise((resolve, reject) => {
-            const aerenderFilePath =
-                "/Applications/Adobe After Effects CC 2019/aerender";
-            const templateFilePath = `${rootPath}/templates/1/template.aep`;
-            const destinationFilePath = `${rootPath}/content/output.mov`;
+            const systemPlatform = os.platform;
 
-            console.log("> [video-robot] Starting After Effects")
+            if (systemPlatform == "darwin") {
+                const aerenderFilePath =
+                    "/Applications/Adobe After Effects CC 2019/aerender";
+            } else if (systemPlatform == "win32") {
+                const aerenderFilePath =
+                    "%programfiles%\\Adobe\\Adobe After Effects CC\\Arquivos de suporte\\aerender.exe";
+            } else {
+                return reject(new Error("System not Supported"));
+            }
+
+            const templateFilePath = fromRoot("./templates/1/template.aep");
+            const destinationFilePath = fromRoot("./content/output.mov");
+
+            console.log("> [video-robot] Starting After Effects");
 
             const aerender = spawn(aerenderFilePath, [
                 "-comp",
@@ -173,38 +186,39 @@ async function robot() {
                 templateFilePath,
                 "-output",
                 destinationFilePath
-            ])
+            ]);
 
             aerender.stdout.on("data", data => {
-                process.stdout.write(data)
-            })
+                process.stdout.write(data);
+            });
 
             aerender.on("close", () => {
-                console.log("> [video-robot] After Effects closed")
-                content.videoFilePath = destinationFilePath
-                resolve()
-            })
-        })
+                console.log("> [video-robot] After Effects closed");
+                content.videoFilePath = destinationFilePath;
+                resolve();
+            });
+        });
     }
 
     async function renderVideoWithNode() {
         return new Promise((resolve, reject) => {
             const destinationFilePath = `${rootPath}/content/output.mp4`;
 
-            let images = []
+            let images = [];
 
             for (
                 let sentenceIndex = 0;
                 sentenceIndex < content.sentences.length;
                 sentenceIndex++
             ) {
-                const slideTransition = content.sentences[sentenceIndex].wordcount.total * 0.6 // Leitura de 100 palavras por minuto
-                console.log(`>[video-robot] DEBUG: loop: ${slideTransition}`)
+                const slideTransition =
+                    content.sentences[sentenceIndex].wordcount.total * (60 / 130); // Leitura de 100 palavras por minuto
+                console.log(`> [video-robot] DEBUG: loop: ${slideTransition}`);
                 images.push({
                     path: `./content/${sentenceIndex}-converted.png`,
                     caption: content.sentences[sentenceIndex].text,
                     loop: slideTransition // loop variável de acordo com o tamanho das palavras
-                })
+                });
             }
 
             const videoOptions = {
@@ -237,7 +251,7 @@ async function robot() {
                     MarginR: "60",
                     MarginV: "40"
                 }
-            }
+            };
 
             videoshow(images, videoOptions)
                 .audio("./templates/1/newsroom.mp3")
@@ -252,10 +266,10 @@ async function robot() {
                 })
                 .on("end", function (output) {
                     console.error("> [video-robot] Video created in:", output);
-                    content.videoFilePath = destinationFilePath
-                    resolve()
-                })
-        })
+                    content.videoFilePath = destinationFilePath;
+                    resolve();
+                });
+        });
     }
 
     async function renderVideo(type) {
@@ -267,4 +281,4 @@ async function robot() {
     }
 }
 
-module.exports = robot
+module.exports = robot;
