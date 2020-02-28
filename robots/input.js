@@ -24,7 +24,8 @@ async function robot() {
   }
   const { selectedLangText, selectedLangIndex } = askAndReturnLanguage();
   content.lang = selectedLangText;
-  content.prefix = askAndReturnPrefix(selectedLangIndex);
+  const { selectedPrefixText, selectedPrefixIndex } = askAndReturnPrefix(selectedLangIndex);
+  content.prefix = selectedPrefixText
   state.save(content);
 
   function askSearchTermSource() {
@@ -41,13 +42,17 @@ async function robot() {
 
   function askAndReturnPrefix(selectedLangIndex) {
     const prefixes = [["Quem é", "O que é", "A história de"], ["Who is", "What is", "The history of"]];
+    const prefixesBySelectedLang = prefixes[selectedLangIndex];
     const selectedPrefixIndex = readline.keyInSelect(
-      prefixes[selectedLangIndex],
+      prefixesBySelectedLang,
       "Choose one option: "
     );
-    const selectedPrefixText = prefixes[selectedPrefixIndex];
+    const selectedPrefixText = prefixes[selectedLangIndex][selectedPrefixIndex];
 
-    return selectedPrefixText;
+    return {
+      selectedPrefixText: selectedPrefixText,
+      selectedPrefixIndex: selectedPrefixIndex
+    };
   }
 
   async function askAndReturnTrend() {
@@ -80,7 +85,10 @@ async function robot() {
       "Choice Language: "
     );
     const selectedLangText = language[selectedLangIndex];
-    return { selectedLangText, selectedLangIndex };
+    return {
+      selectedLangText: selectedLangText,
+      selectedLangIndex: selectedLangIndex
+    };
   }
 }
 
