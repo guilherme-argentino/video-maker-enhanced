@@ -22,8 +22,9 @@ async function robot() {
       // code block
       content.searchTerm = askAndReturnSearchTerm();
   }
-  content.prefix = askAndReturnPrefix();
-  content.lang = askAndReturnLanguage();
+  const { selectedLangText, selectedLangIndex } = askAndReturnLanguage();
+  content.lang = selectedLangText;
+  content.prefix = askAndReturnPrefix(selectedLangIndex);
   state.save(content);
 
   function askSearchTermSource() {
@@ -38,10 +39,10 @@ async function robot() {
     return readline.question("Type a Wikipedia search term: ");
   }
 
-  function askAndReturnPrefix() {
-    const prefixes = ["Who is", "What is", "The history of"];
+  function askAndReturnPrefix(selectedLangIndex) {
+    const prefixes = [["Quem é", "O que é", "A história de"], ["Who is", "What is", "The history of"]];
     const selectedPrefixIndex = readline.keyInSelect(
-      prefixes,
+      prefixes[selectedLangIndex],
       "Choose one option: "
     );
     const selectedPrefixText = prefixes[selectedPrefixIndex];
@@ -79,7 +80,7 @@ async function robot() {
       "Choice Language: "
     );
     const selectedLangText = language[selectedLangIndex];
-    return selectedLangText;
+    return { selectedLangText, selectedLangIndex };
   }
 }
 
