@@ -11,20 +11,28 @@ async function robot() {
 
   const searchTermInputOption = askSearchTermSource();
 
-  switch (searchTermInputOption) {
-    case "Google Trends":
-      content.searchTerm = await askAndReturnTrend();
-      // code block
-      break;
-    case "Keyboard":
-    // code block
-    default:
-      // code block
-      content.searchTerm = askAndReturnSearchTerm();
-  }
-  content.prefix = askAndReturnPrefix();
-  content.lang = askAndReturnLanguage();
+  content.searchTerm = await selectSearchTermFlow(searchTermInputOption);
+  const { selectedLangText, selectedLangIndex } = askAndReturnLanguage();
+  content.lang = selectedLangText;
+  const { selectedPrefixText, selectedPrefixIndex } = askAndReturnPrefix(selectedLangIndex);
+  content.prefix = selectedPrefixText
   state.save(content);
+
+  async function selectSearchTermFlow(searchTermInputOption) {
+    let result = ""
+    switch (searchTermInputOption) {
+      case "Google Trends":
+        result = await askAndReturnTrend();
+        // code block
+        break;
+      case "Keyboard":
+      // code block
+      default:
+        // code block
+        result = askAndReturnSearchTerm();
+    }
+    return result
+  }
 
   function askSearchTermSource() {
     const searchTermInputOptionIndex = readline.keyInSelect(
@@ -38,15 +46,19 @@ async function robot() {
     return readline.question("Type a Wikipedia search term: ");
   }
 
-  function askAndReturnPrefix() {
-    const prefixes = ["Who is", "What is", "The history of"];
+  function askAndReturnPrefix(selectedLangIndex) {
+    const prefixes = [["Quem é", "O que é", "A história de"], ["Who is", "What is", "The history of"]];
+    const prefixesBySelectedLang = prefixes[selectedLangIndex];
     const selectedPrefixIndex = readline.keyInSelect(
-      prefixes,
+      prefixesBySelectedLang,
       "Choose one option: "
     );
-    const selectedPrefixText = prefixes[selectedPrefixIndex];
+    const selectedPrefixText = prefixes[selectedLangIndex][selectedPrefixIndex];
 
-    return selectedPrefixText;
+    return {
+      selectedPrefixText: selectedPrefixText,
+      selectedPrefixIndex: selectedPrefixIndex
+    };
   }
 
   async function askAndReturnTrend() {
@@ -79,7 +91,10 @@ async function robot() {
       "Choice Language: "
     );
     const selectedLangText = language[selectedLangIndex];
-    return selectedLangText;
+    return {
+      selectedLangText: selectedLangText,
+      selectedLangIndex: selectedLangIndex
+    };
   }
 }
 

@@ -8,6 +8,7 @@ const fs = require('fs')
 async function robot() {
     console.log('> [youtube-robot] Starting...')
     const content = state.load()
+    console.log(`> [youtube-robot] Título: ${content.prefix} ${content.searchTerm}`)
 
     await authenticateWithOAuth()
     const videoInformation = await uploadVideo(content)
