@@ -11,22 +11,28 @@ async function robot() {
 
   const searchTermInputOption = askSearchTermSource();
 
-  switch (searchTermInputOption) {
-    case "Google Trends":
-      content.searchTerm = await askAndReturnTrend();
-      // code block
-      break;
-    case "Keyboard":
-    // code block
-    default:
-      // code block
-      content.searchTerm = askAndReturnSearchTerm();
-  }
+  content.searchTerm = await selectSearchTermFlow(searchTermInputOption);
   const { selectedLangText, selectedLangIndex } = askAndReturnLanguage();
   content.lang = selectedLangText;
   const { selectedPrefixText, selectedPrefixIndex } = askAndReturnPrefix(selectedLangIndex);
   content.prefix = selectedPrefixText
   state.save(content);
+
+  async function selectSearchTermFlow(searchTermInputOption) {
+    let result = ""
+    switch (searchTermInputOption) {
+      case "Google Trends":
+        result = await askAndReturnTrend();
+        // code block
+        break;
+      case "Keyboard":
+      // code block
+      default:
+        // code block
+        result = askAndReturnSearchTerm();
+    }
+    return result
+  }
 
   function askSearchTermSource() {
     const searchTermInputOptionIndex = readline.keyInSelect(
