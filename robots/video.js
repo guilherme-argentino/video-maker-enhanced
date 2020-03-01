@@ -225,37 +225,37 @@ async function robot() {
         });
       }
 
-      const videoOptions = {
-        fps: 25,
-        loop: 10, // seconds
-        transition: true,
-        transitionDuration: 1, // seconds
-        videoBitrate: 1024,
-        videoCodec: "libx264",
-        size: "800x?",
-        audioBitrate: "128k",
-        audioChannels: 2,
-        format: "mp4",
-        pixelFormat: "yuv420p",
-        useSubRipSubtitles: false, // Use ASS/SSA subtitles instead
-        subtitleStyle: {
-          Fontname: "Verdana",
-          Fontsize: "26",
-          PrimaryColour: "11861244",
-          SecondaryColour: "11861244",
-          TertiaryColour: "11861244",
-          BackColour: "-2147483640",
-          Bold: "2",
-          Italic: "0",
-          BorderStyle: "2",
-          Outline: "2",
-          Shadow: "3",
-          Alignment: "1", // left, middle, right
-          MarginL: "40",
-          MarginR: "60",
-          MarginV: "40"
-        }
-      };
+            const videoOptions = {
+                fps: 25,
+                loop: 10, // seconds
+                transition: true,
+                transitionDuration: 1, // seconds
+                videoBitrate: 1024,
+                videoCodec: "libx264",
+                size: "?x1080",
+                audioBitrate: "128k",
+                audioChannels: 2,
+                format: "mp4",
+                pixelFormat: "yuv420p",
+                useSubRipSubtitles: false, // Use ASS/SSA subtitles instead
+                subtitleStyle: {
+                    Fontname: "Verdana",
+                    Fontsize: "26",
+                    PrimaryColour: "11861244",
+                    SecondaryColour: "11861244",
+                    TertiaryColour: "11861244",
+                    BackColour: "-2147483640",
+                    Bold: "2",
+                    Italic: "0",
+                    BorderStyle: "2",
+                    Outline: "2",
+                    Shadow: "3",
+                    Alignment: "1", // left, middle, right
+                    MarginL: "40",
+                    MarginR: "60",
+                    MarginV: "40"
+                }
+            };
 
       videoshow(images, videoOptions)
         .audio("./templates/1/newsroom.mp3")

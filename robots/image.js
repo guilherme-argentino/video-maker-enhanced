@@ -37,6 +37,7 @@ async function robot() {
             cx: googleSearchCredentials.searchEngineId,
             q: query,
             searchType: 'image',
+            size: 'large',
             num: 2
         })
 
