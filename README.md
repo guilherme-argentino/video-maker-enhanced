@@ -7,6 +7,7 @@ Passo-a-passo de criação da playlist https://www.youtube.com/playlist?list=PLM
 
 - Git (https://git-scm.com/)
 - Node (https://nodejs.org)
+- ImageMagick (https://imagemagick.org/)
 
 # Instalação
 
@@ -16,6 +17,9 @@ Estou vendo que alguns devs aqui estão com problemas para rodar o projeto, talv
 
 ## Start ##
 Vou partir do princípio que você caiu na playlist e é aspirantes a programação e não está familiarizados com o **Git** ou **Node.js**, então primeiro você precisa instalar o [Node.js](https://nodejs.org/en/) no seu pc e seguir o procedimento padrão de instalação **next->next->ok**, recomendo você baixar o [Git](https://git-scm.com/downloads) e instalar na sua maquina.
+
+Para usuários Windows, ao instalar o [ImageMagick](https://imagemagick.org/). Lembre-se de marcar a opção de utilitários legados `Install Legacy Utilities (e.g. convert)`
+
 
 ## Clonando o Repositório ##
 Com o Git e o Node.js instalado na sua maquina e a **URL** do projeto em mãos, cria em algum lugar do seu pc uma pasta para criarmos uma copia do repositório, dentro dela abra o **cmd** ou **powershell** e digite os comandos abaixo:
