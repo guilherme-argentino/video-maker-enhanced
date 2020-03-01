@@ -228,7 +228,7 @@ async function robot() {
                 transitionDuration: 1, // seconds
                 videoBitrate: 1024,
                 videoCodec: "libx264",
-                size: "800x?",
+                size: "?x1080",
                 audioBitrate: "128k",
                 audioChannels: 2,
                 format: "mp4",
