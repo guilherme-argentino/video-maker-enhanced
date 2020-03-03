@@ -25,6 +25,16 @@ File: `watson-nlu.json`
 }
 ```
 
+## Gotiy.Ai's Sentiment/Emotion API
+
+File: `gotit.ai.json`
+
+```
+{
+    "apiKey": "...",
+}
+```
+
 ## Google's Custom Search API
 
 File: `google-search.json`
