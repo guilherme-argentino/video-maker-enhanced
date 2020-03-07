@@ -1,83 +1,83 @@
-const imageDownloader = require('image-downloader');
-const { google } = require('googleapis');
+import { image } from 'image-downloader'
+import { google } from 'googleapis'
+import { load, save } from './state.js'
 
-const customSearch = google.customsearch('v1');
-const state = require('./state.js');
+import { apiKey, searchEngineId } from '../credentials/google-search.json'
 
-const googleSearchCredentials = require('../credentials/google-search.json');
+const customSearch = google.customsearch('v1')
 
-async function robot() {
-  console.log('> [image-robot] Starting...');
-  const content = state.load();
+async function robot () {
+  console.log('> [image-robot] Starting...')
+  const content = load()
 
-  await fetchImagesOfAllSentences();
-  await downloadAllImages(content);
+  await fetchImagesOfAllSentences()
+  await downloadAllImages(content)
 
-  state.save(content);
+  save(content)
 
-  async function fetchImagesOfAllSentences() {
+  async function fetchImagesOfAllSentences () {
     for (let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++) {
-      let query;
+      let query
 
       if (sentenceIndex === 0) {
-        query = `${content.searchTerm}`;
+        query = `${content.searchTerm}`
       } else {
-        query = `${content.searchTerm} ${content.sentences[sentenceIndex].keywords[0]}`;
+        query = `${content.searchTerm} ${content.sentences[sentenceIndex].keywords[0]}`
       }
 
-      console.log(`> [image-robot] Querying Google Images with: "${query}"`);
+      console.log(`> [image-robot] Querying Google Images with: "${query}"`)
 
-      content.sentences[sentenceIndex].images = await fetchGoogleAndReturnImagesLinks(query);
-      content.sentences[sentenceIndex].googleSearchQuery = query;
+      content.sentences[sentenceIndex].images = await fetchGoogleAndReturnImagesLinks(query)
+      content.sentences[sentenceIndex].googleSearchQuery = query
     }
   }
 
-  async function fetchGoogleAndReturnImagesLinks(query) {
+  async function fetchGoogleAndReturnImagesLinks (query) {
     const response = await customSearch.cse.list({
-      auth: googleSearchCredentials.apiKey,
-      cx: googleSearchCredentials.searchEngineId,
+      auth: apiKey,
+      cx: searchEngineId,
       q: query,
       searchType: 'image',
       // size: 'large',
-      num: 5,
-    });
+      num: 5
+    })
 
-    const imagesUrl = response.data.items.map((item) => item.link);
+    const imagesUrl = response.data.items.map((item) => item.link)
 
-    return imagesUrl;
+    return imagesUrl
   }
 
-  async function downloadAllImages(content) {
-    content.downloadedImages = [];
+  async function downloadAllImages (content) {
+    content.downloadedImages = []
 
     for (let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++) {
-      const { images } = content.sentences[sentenceIndex];
+      const { images } = content.sentences[sentenceIndex]
 
       for (let imageIndex = 0; imageIndex < images.length; imageIndex++) {
-        const imageUrl = images[imageIndex];
+        const imageUrl = images[imageIndex]
 
         try {
           if (content.downloadedImages.includes(imageUrl)) {
-            throw new Error('Image already downloaded');
+            throw new Error('Image already downloaded')
           }
 
-          await downloadAndSave(imageUrl, `${sentenceIndex}-original.png`);
-          content.downloadedImages.push(imageUrl);
-          console.log(`> [image-robot] [${sentenceIndex}][${imageIndex}] Image successfully downloaded: ${imageUrl}`);
-          break;
+          await downloadAndSave(imageUrl, `${sentenceIndex}-original.png`)
+          content.downloadedImages.push(imageUrl)
+          console.log(`> [image-robot] [${sentenceIndex}][${imageIndex}] Image successfully downloaded: ${imageUrl}`)
+          break
         } catch (error) {
-          console.log(`> [image-robot] [${sentenceIndex}][${imageIndex}] Error (${imageUrl}): ${error}`);
+          console.log(`> [image-robot] [${sentenceIndex}][${imageIndex}] Error (${imageUrl}): ${error}`)
         }
       }
     }
   }
 
-  async function downloadAndSave(url, fileName) {
-    return imageDownloader.image({
+  async function downloadAndSave (url, fileName) {
+    return image({
       url,
-      dest: `./content/${fileName}`,
-    });
+      dest: `./content/${fileName}`
+    })
   }
 }
 
-module.exports = robot;
+export default robot
