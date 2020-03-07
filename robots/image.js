@@ -10,12 +10,12 @@ async function robot() {
   console.log('> [image-robot] Starting...');
   const content = state.load();
 
-  await fetchImagesOfAllSentences(content);
+  await fetchImagesOfAllSentences();
   await downloadAllImages(content);
 
   state.save(content);
 
-  async function fetchImagesOfAllSentences(content) {
+  async function fetchImagesOfAllSentences() {
     for (let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++) {
       let query;
 
@@ -39,7 +39,7 @@ async function robot() {
       q: query,
       searchType: 'image',
       // size: 'large',
-      num: 2,
+      num: 5,
     });
 
     const imagesUrl = response.data.items.map((item) => item.link);
