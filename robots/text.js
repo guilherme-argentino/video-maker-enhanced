@@ -9,6 +9,8 @@ import { apiKey as algorithmiaApiKey } from '../credentials/algorithmia.json'
 
 import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
 
+import { load, save } from './state.js'
+
 const nlu = new NaturalLanguageUnderstandingV1({
   iam_apikey: watsonApiKey,
   version: '2018-04-05',
@@ -19,8 +21,6 @@ const gotitailanguages = {
   pt: 'PtBr',
   en: 'EnUs'
 }
-
-import { load, save } from './state.js'
 
 async function robot () {
   console.log('> [text-robot] Starting...')
