@@ -1,5 +1,5 @@
 module.exports = {
-  extends: "airbnb-base",
+  extends: "standard",
   plugins: ["jest"],
   rules: {
     "no-console": "off"

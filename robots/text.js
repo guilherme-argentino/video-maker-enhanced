@@ -1,110 +1,111 @@
-const algorithmia = require('algorithmia');
-const sentenceBoundaryDetection = require('sbd');
-const fetch = require('node-fetch');
-const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
+/* eslint-disable linebreak-style */
+import algorithmia from 'algorithmia'
+import { sentences as _sentences } from 'sbd'
+import fetch from 'node-fetch'
+import NaturalLanguageUnderstandingV1 from 'watson-developer-cloud/natural-language-understanding/v1.js'
 
-const watsonApiKey = require('../credentials/watson-nlu.json').apikey;
-const algorithmiaApiKey = require('../credentials/algorithmia.json').apiKey;
+import { apikey as watsonApiKey } from '../credentials/watson-nlu.json'
+import { apiKey as algorithmiaApiKey } from '../credentials/algorithmia.json'
 
-const gotitaiApiKey = require('../credentials/gotit.ai.json').apiKey;
+import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
 
 const nlu = new NaturalLanguageUnderstandingV1({
   iam_apikey: watsonApiKey,
   version: '2018-04-05',
-  url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/',
-});
+  url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
+})
 
 const gotitailanguages = {
   pt: 'PtBr',
-  en: 'EnUs',
-};
+  en: 'EnUs'
+}
 
-const state = require('./state.js');
+import { load, save } from './state.js'
 
-async function robot() {
-  console.log('> [text-robot] Starting...');
-  const content = state.load();
+async function robot () {
+  console.log('> [text-robot] Starting...')
+  const content = load()
 
-  await fetchContentFromWikipedia();
-  sanitzeContent();
-  breakContentIntoSentences();
-  limitMaximumSentences();
-  await fetchKeywordsOfAllSentences();
-  await fetchGotItAi();
+  await fetchContentFromWikipedia()
+  sanitzeContent()
+  breakContentIntoSentences()
+  limitMaximumSentences()
+  await fetchKeywordsOfAllSentences()
+  await fetchGotItAi()
 
-  state.save(content);
+  save(content)
 
-  async function fetchContentFromWikipedia() {
-    const algorithmiaAutenticated = algorithmia(algorithmiaApiKey);
+  async function fetchContentFromWikipedia () {
+    const algorithmiaAutenticated = algorithmia(algorithmiaApiKey)
     const wikipediaAlgorithm = algorithmiaAutenticated.algo(
-      'web/WikipediaParser/0.1.2?timeout=300',
-    );
+      'web/WikipediaParser/0.1.2?timeout=300'
+    )
     const wikipediaResponde = await wikipediaAlgorithm.pipe({
       lang: content.lang,
-      articleName: content.searchTerm,
-    });
-    const wikipediaContent = wikipediaResponde.get();
-    content.sourceContentOriginal = wikipediaContent.content;
+      articleName: content.searchTerm
+    })
+    const wikipediaContent = wikipediaResponde.get()
+    content.sourceContentOriginal = wikipediaContent.content
   }
 
-  function sanitzeContent() {
+  function sanitzeContent () {
     const withoutBlankLinesAndMarkdown = removeBlankLinesAndMarkdown(
-      content.sourceContentOriginal,
-    );
+      content.sourceContentOriginal
+    )
     const withoutDatesInParenthesis = removeDatesInParenthesis(
-      withoutBlankLinesAndMarkdown,
-    );
+      withoutBlankLinesAndMarkdown
+    )
 
-    content.sourceContentSanitized = withoutDatesInParenthesis;
+    content.sourceContentSanitized = withoutDatesInParenthesis
 
-    function removeBlankLinesAndMarkdown(text) {
-      const allLines = text.split('\n');
+    function removeBlankLinesAndMarkdown (text) {
+      const allLines = text.split('\n')
 
       const withoutBlankLinesAndMarkdownArray = allLines.filter((line) => {
         if (line.trim().length === 0 || line.trim().startsWith('=')) {
-          return false;
+          return false
         }
-        return true;
-      });
-      return withoutBlankLinesAndMarkdownArray.join(' ');
+        return true
+      })
+      return withoutBlankLinesAndMarkdownArray.join(' ')
     }
   }
 
-  function removeDatesInParenthesis(text) {
+  function removeDatesInParenthesis (text) {
     return text
       .replace(/\((?:\([^()]*\)|[^()])*\)/gm, '')
-      .replace(/ {2}/g, ' ');
+      .replace(/ {2}/g, ' ')
   }
 
-  function breakContentIntoSentences() {
-    content.sentences = [];
+  function breakContentIntoSentences () {
+    content.sentences = []
 
-    const sentences = sentenceBoundaryDetection.sentences(
-      content.sourceContentSanitized,
-    );
+    const sentences = _sentences(
+      content.sourceContentSanitized
+    )
     sentences.forEach((sentence) => {
       content.sentences.push({
         text: sentence,
         wordcount: countWords(sentence),
         keywords: [],
-        images: [],
-      });
-    });
+        images: []
+      })
+    })
   }
 
-  function limitMaximumSentences() {
-    content.sentences = content.sentences.slice(0, content.maximumSentences);
+  function limitMaximumSentences () {
+    content.sentences = content.sentences.slice(0, content.maximumSentences)
   }
 
-  async function fetchGotItAi() {
+  async function fetchGotItAi () {
     const body = {
       T: content.sourceContentSanitized,
       S: true,
       EM: true,
-      SL: gotitailanguages[content.lang],
-    };
-    const url = 'https://api.gotit.ai/NLU/v1.4/Analyze';
-    console.log('> [text-robot] Getting feeling from GotIt.Ai');
+      SL: gotitailanguages[content.lang]
+    }
+    const url = 'https://api.gotit.ai/NLU/v1.4/Analyze'
+    console.log('> [text-robot] Getting feeling from GotIt.Ai')
     const getData = async (url) => {
       try {
         const response = await fetch(url, {
@@ -112,90 +113,89 @@ async function robot() {
           body: JSON.stringify(body),
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Basic ${gotitaiApiKey}`,
-          },
-        });
+            Authorization: `Basic ${gotitaiApiKey}`
+          }
+        })
 
-        const json = await response.json();
-        const arr = Object.values(json.emotions);
-        const max = Math.max(...arr);
+        const json = await response.json()
+        const arr = Object.values(json.emotions)
+        const max = Math.max(...arr)
         const emotions = Object.entries(json.emotions).reduce((ret, entry) => {
-          const [key, value] = entry;
-          ret[value] = key;
-          return ret;
-        }, {});
-        content.feeling = emotions[max];
+          const [key, value] = entry
+          ret[value] = key
+          return ret
+        }, {})
+        content.feeling = emotions[max]
         console.log(
-          `> [text-robot] the feeling is ${content.feeling}: by GotIt.Ai`,
-        );
+          `> [text-robot] the feeling is ${content.feeling}: by GotIt.Ai`
+        )
       } catch (error) {
-        console.log(`> [text-robot] ${error}`);
+        console.log(`> [text-robot] ${error}`)
       }
-    };
-    await getData(url);
+    }
+    await getData(url)
   }
 
-  async function fetchKeywordsOfAllSentences() {
-    console.log('> [text-robot] Starting to fetch keywords from Watson');
-    const listOfKeywordsToFetch = [];
+  async function fetchKeywordsOfAllSentences () {
+    console.log('> [text-robot] Starting to fetch keywords from Watson')
+    const listOfKeywordsToFetch = []
 
     content.sentences.forEach((element, index, array) => {
-      listOfKeywordsToFetch.push(fetchWatsonAndReturnKeywords(element));
-    });
+      listOfKeywordsToFetch.push(fetchWatsonAndReturnKeywords(element))
+    })
 
-    await Promise.all(listOfKeywordsToFetch);
+    await Promise.all(listOfKeywordsToFetch)
   }
 
-  function countWords(sentence) {
+  function countWords (sentence) {
     const index = {
       total: 0,
-      words: [],
-    };
+      words: []
+    }
     const words = sentence
       .replace(/[.,?!;()"'-]/g, ' ')
       .replace(/\s+/g, ' ')
       .toLowerCase()
-      .split(' ');
+      .split(' ')
 
     words.forEach((word) => {
-      if (!index.words.hasOwnProperty(word)) {
-        index.words[word] = 0;
+      if (!Object.prototype.hasOwnProperty.call(index.words, word)) {
+        index.words[word] = 0
       }
-      index.words[word]++;
-      index.total++;
-    });
+      index.words[word]++
+      index.total++
+    })
 
-    return index;
+    return index
   }
 
-  async function fetchWatsonAndReturnKeywords(sentence) {
+  async function fetchWatsonAndReturnKeywords (sentence) {
     return new Promise((resolve, reject) => {
-
       nlu.analyze(
         {
           text: sentence.text,
           features: {
-            keywords: {},
-          },
+            keywords: {}
+          }
         },
         (error, response) => {
           if (error) {
-            reject(error);
-            return;
+            reject(error)
+            return
           }
 
-          const keywords = response.keywords.map((keyword) => keyword.text);
+          const keywords = response.keywords.map((keyword) => keyword.text)
 
           sentence.keywords = keywords
 
-          console.log(`> [text-robot] Sentence: "${sentence.text}"`);
-          console.log(`> [text-robot] Keywords: ${sentence.keywords.join(', ')}\n`);
+          console.log(`> [text-robot] Sentence: "${sentence.text}"`)
+          console.log(`> [text-robot] Keywords: ${sentence.keywords.join(', ')}\n`)
 
-          resolve(keywords);
-        },
-      );
-    });
+          resolve(keywords)
+        }
+      )
+    })
   }
 }
 
-module.exports = robot;
+export default robot
