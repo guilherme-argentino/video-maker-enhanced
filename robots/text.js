@@ -71,7 +71,9 @@ async function robot() {
   }
 
   function removeDatesInParenthesis(text) {
-    return text.replace(/\((?:\([^()]*\)|[^()])*\)/gm, '').replace(/ {2}/g, ' ');
+    return text
+      .replace(/\((?:\([^()]*\)|[^()])*\)/gm, '')
+      .replace(/ {2}/g, ' ');
   }
 
   function breakContentIntoSentences() {
@@ -123,7 +125,9 @@ async function robot() {
           return ret;
         }, {});
         content.feeling = emotions[max];
-        console.log(`> [text-robot] the feeling is ${content.feeling}: by GotIt.Ai`);
+        console.log(
+          `> [text-robot] the feeling is ${content.feeling}: by GotIt.Ai`,
+        );
       } catch (error) {
         console.log(`> [text-robot] ${error}`);
       }
@@ -133,14 +137,13 @@ async function robot() {
 
   async function fetchKeywordsOfAllSentences() {
     console.log('> [text-robot] Starting to fetch keywords from Watson');
+    const listOfKeywordsToFetch = [];
 
-    for (const sentence of content.sentences) {
-      console.log(`> [text-robot] Sentence: "${sentence.text}"`);
+    content.sentences.forEach((element, index, array) => {
+      listOfKeywordsToFetch.push(fetchWatsonAndReturnKeywords(element));
+    });
 
-      sentence.keywords = await fetchWatsonAndReturnKeywords(sentence.text);
-
-      console.log(`> [text-robot] Keywords: ${sentence.keywords.join(', ')}\n`);
-    }
+    await Promise.all(listOfKeywordsToFetch);
   }
 
   function countWords(sentence) {
@@ -155,7 +158,7 @@ async function robot() {
       .split(' ');
 
     words.forEach((word) => {
-      if (!(index.words.hasOwnProperty(word))) {
+      if (!index.words.hasOwnProperty(word)) {
         index.words[word] = 0;
       }
       index.words[word]++;
@@ -167,9 +170,10 @@ async function robot() {
 
   async function fetchWatsonAndReturnKeywords(sentence) {
     return new Promise((resolve, reject) => {
+
       nlu.analyze(
         {
-          text: sentence,
+          text: sentence.text,
           features: {
             keywords: {},
           },
@@ -181,6 +185,11 @@ async function robot() {
           }
 
           const keywords = response.keywords.map((keyword) => keyword.text);
+
+          sentence.keywords = keywords
+
+          console.log(`> [text-robot] Sentence: "${sentence.text}"`);
+          console.log(`> [text-robot] Keywords: ${sentence.keywords.join(', ')}\n`);
 
           resolve(keywords);
         },
