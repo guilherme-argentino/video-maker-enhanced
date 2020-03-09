@@ -62,6 +62,16 @@ Novamente, voltando na pasta do projeto ainda dentro da pasta **video-maker-enha
 }
 ```
 
+## Api: GotIt AI ##
+
+Mais uma vez, é necessário incluir credenciais em **video-maker-enhanced\credentials**. Desta vez é hora de vistar o site da plataforma [Got It](https://gotit.ai/), fazer um cadastro e copiar as credenciais no arquivo `gotit.ai.json`. Dentro do arquivo deve ser criada uma estrutura simples, como do arquivo `algorithmia.json`.
+
+```js
+{
+  "apiKey": "API_KEY_AQUI"
+}
+```
+
 ## Setup: Google Cloud Plataform ##
 Antes de criarmos as api's que iremos utilizar é necessário vincular a nossa conta do Google com o [Google Cloud Plataform](https://cloud.google.com/), na página do **Google Cloud Plataform** você irá clicar no botão **Faça uma Avaliação Gratuita**:
 
