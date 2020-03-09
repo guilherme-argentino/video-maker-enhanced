@@ -80,4 +80,4 @@ async function robot () {
   }
 }
 
-export default robot
+module.exports = robot
