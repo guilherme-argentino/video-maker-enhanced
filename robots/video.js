@@ -27,16 +27,16 @@ async function robot () {
   save(content)
 
   async function convertAllImages (content) {
-    for (
-      let sentenceIndex = 0;
-      sentenceIndex < content.sentences.length;
-      sentenceIndex++
-    ) {
-      await convertImage(sentenceIndex)
-    }
+    const listOfImagesToConvert = []
+
+    content.sentences.forEach((element, index) => {
+      listOfImagesToConvert.push(convertImage(element, index))
+    })
+
+    await Promise.all(listOfImagesToConvert)
   }
 
-  async function convertImage (sentenceIndex) {
+  async function convertImage (element, sentenceIndex) {
     return new Promise((resolve, reject) => {
       const inputFile = fromRoot(`./content/${sentenceIndex}-original.png[0]`)
       const outputFile = fromRoot(`./content/${sentenceIndex}-converted.png`)
@@ -77,20 +77,18 @@ async function robot () {
           )
           resolve()
         })
+      return element
     })
   }
 
   async function createAllSentenceImages (content) {
-    for (
-      let sentenceIndex = 0;
-      sentenceIndex < content.sentences.length;
-      sentenceIndex++
-    ) {
-      await createSentenceImage(
-        sentenceIndex,
-        content.sentences[sentenceIndex].text
-      )
-    }
+    const listOfImagesToConvert = []
+
+    content.sentences.forEach((element, index) => {
+      listOfImagesToConvert.push(createSentenceImage(index, element))
+    })
+
+    await Promise.all(listOfImagesToConvert)
   }
 
   async function createSentenceImage (sentenceIndex, sentenceText) {
@@ -143,6 +141,7 @@ async function robot () {
           console.log(`> [video-robot] Sentence created: ${outputFile}`)
           resolve()
         })
+      return sentenceText
     })
   }
 
