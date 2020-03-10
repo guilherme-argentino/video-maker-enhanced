@@ -16,20 +16,27 @@ async function robot () {
   save(content)
 
   async function fetchImagesOfAllSentences () {
-    for (let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++) {
-      let query
+    const listOfImagesToFetch = []
 
-      if (sentenceIndex === 0) {
-        query = `${content.searchTerm}`
-      } else {
-        query = `${content.searchTerm} ${content.sentences[sentenceIndex].keywords[0]}`
-      }
+    content.sentences.forEach((element, index) => {
+      listOfImagesToFetch.push(fetchImagesFromOneSentence(element, index))
+    })
 
-      console.log(`> [image-robot] Querying Google Images with: "${query}"`)
+    await Promise.all(listOfImagesToFetch)
+  }
 
-      content.sentences[sentenceIndex].images = await fetchGoogleAndReturnImagesLinks(query)
-      content.sentences[sentenceIndex].googleSearchQuery = query
+  async function fetchImagesFromOneSentence (element, sentenceIndex) {
+    let query
+    if (sentenceIndex === 0) {
+      query = `${content.searchTerm}`
+    } else {
+      query = `${content.searchTerm} ${content.sentences[sentenceIndex].keywords[0]}`
     }
+    console.log(`> [image-robot] Querying Google Images with: "${query}"`)
+    content.sentences[sentenceIndex].images = await fetchGoogleAndReturnImagesLinks(query)
+    content.sentences[sentenceIndex].googleSearchQuery = query
+
+    return element
   }
 
   async function fetchGoogleAndReturnImagesLinks (query) {
@@ -39,6 +46,7 @@ async function robot () {
       q: query,
       searchType: 'image',
       // size: 'large',
+      rights: 'cc_publicdomain,cc_attribute',
       num: 5
     })
 
