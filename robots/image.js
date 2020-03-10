@@ -46,7 +46,7 @@ async function robot () {
       q: query,
       searchType: 'image',
       // size: 'large',
-      rights: 'cc_publicdomain,cc_attribute',
+      // rights: 'cc_publicdomain,cc_attribute',
       num: 5
     })
 
