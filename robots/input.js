@@ -1,6 +1,6 @@
-const readline = require('readline-sync')
-const Parser = require('rss-parser')
-const state = require('./state.js')
+import { keyInSelect, question } from 'readline-sync'
+import Parser from 'rss-parser'
+import { save } from './state.js'
 
 async function robot () {
   const content = {
@@ -16,7 +16,7 @@ async function robot () {
   content.lang = selectedLangText
   const { selectedPrefixText } = askAndReturnPrefix(selectedLangIndex)
   content.prefix = selectedPrefixText
-  state.save(content)
+  save(content)
 
   async function selectSearchTermFlow (searchTermInputOption) {
     let result = ''
@@ -32,7 +32,7 @@ async function robot () {
   }
 
   function askSearchTermSource () {
-    const searchTermInputOptionIndex = readline.keyInSelect(
+    const searchTermInputOptionIndex = keyInSelect(
       searchTermInputOptions,
       'Choose one option: '
     )
@@ -40,13 +40,13 @@ async function robot () {
   }
 
   function askAndReturnSearchTerm () {
-    return readline.question('Type a Wikipedia search term: ')
+    return question('Type a Wikipedia search term: ')
   }
 
   function askAndReturnPrefix (selectedLangIndex) {
     const prefixes = [['Quem é', 'O que é', 'A história de'], ['Who is', 'What is', 'The history of']]
     const prefixesBySelectedLang = prefixes[selectedLangIndex]
-    const selectedPrefixIndex = readline.keyInSelect(
+    const selectedPrefixIndex = keyInSelect(
       prefixesBySelectedLang,
       'Choose one option: '
     )
@@ -60,13 +60,13 @@ async function robot () {
 
   async function askAndReturnTrend () {
     const geo = ['BR', 'US']
-    const selectedGeoIndex = readline.keyInSelect(geo, 'Choice Trend Geo: ')
+    const selectedGeoIndex = keyInSelect(geo, 'Choice Trend Geo: ')
     const selectedGeoText = geo[selectedGeoIndex]
     content.trendGeo = selectedGeoText
 
     console.log('Please Wait...')
     const trends = await getGoogleTrends()
-    const choice = readline.keyInSelect(trends, 'Choose your trend:')
+    const choice = keyInSelect(trends, 'Choose your trend:')
 
     return trends[choice]
   }
@@ -82,7 +82,7 @@ async function robot () {
 
   function askAndReturnLanguage () {
     const language = ['pt', 'en']
-    const selectedLangIndex = readline.keyInSelect(
+    const selectedLangIndex = keyInSelect(
       language,
       'Choice Language: '
     )

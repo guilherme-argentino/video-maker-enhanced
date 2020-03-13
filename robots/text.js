@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 import algorithmia from 'algorithmia'
 import { sentences as _sentences } from 'sbd'
 import fetch from 'node-fetch'
