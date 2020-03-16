@@ -140,7 +140,7 @@ async function robot () {
     const listOfKeywordsToFetch = []
 
     content.sentences.forEach((element, index, array) => {
-      listOfKeywordsToFetch.push(fetchWatsonAndReturnKeywords(element))
+      listOfKeywordsToFetch.push(fetchWatsonAndReturnKeywords(element, index))
     })
 
     await Promise.all(listOfKeywordsToFetch)
@@ -168,7 +168,7 @@ async function robot () {
     return index
   }
 
-  async function fetchWatsonAndReturnKeywords (sentence) {
+  async function fetchWatsonAndReturnKeywords (sentence, index) {
     return new Promise((resolve, reject) => {
       nlu.analyze(
         {
@@ -187,8 +187,8 @@ async function robot () {
 
           sentence.keywords = keywords
 
-          console.log(`> [text-robot] Sentence: "${sentence.text}"`)
-          console.log(`> [text-robot] Keywords: ${sentence.keywords.join(', ')}\n`)
+          console.log(`> [text-robot] Sentence [${index}]: "${sentence.text}"`)
+          console.log(`> [text-robot] Keywords [${index}]: ${sentence.keywords.join(', ')}\n`)
 
           resolve(keywords)
         }

@@ -5,7 +5,7 @@ const youtube = google.youtube({ version: 'v3' })
 const { OAuth2 } = google.auth
 const fs = require('fs')
 const opn = require('opn')
-const state = require('./state.js').default
+const state = require('./state.js')
 
 async function robot () {
   console.log('> [youtube-robot] Starting...')
