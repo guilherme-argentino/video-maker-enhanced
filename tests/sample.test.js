@@ -1,7 +1,7 @@
-function foo() {
-  return 'ok';
+function foo () {
+  return 'ok'
 }
 
 test('test foo()', () => {
-  expect(foo()).toBe('ok');
-});
+  expect(foo()).toBe('ok')
+})
