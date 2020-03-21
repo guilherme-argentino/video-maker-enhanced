@@ -137,13 +137,13 @@ async function robot () {
       onUploadProgress
     })
 
-    console.log(`> [youtube-robot] Video available at: https://youtu.be/${youtubeResponse.data.id}`)
+    console.log('\n' + `> [youtube-robot] Video available at: https://youtu.be/${youtubeResponse.data.id}`)
     opn(`https://youtu.be/${youtubeResponse.data.id}`)
     return youtubeResponse.data
 
     function onUploadProgress (event) {
       const progress = Math.round((event.bytesRead / videoFileSize) * 100)
-      console.log(`> [youtube-robot] ${progress}% completed`)
+      process.stdout.write('\r' + `> [youtube-robot] ${progress}% completed `)
     }
   }
 
