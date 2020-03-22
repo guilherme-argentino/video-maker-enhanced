@@ -7,12 +7,20 @@ import videoshow from 'videoshow'
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg'
 import { path as ffprobePath } from '@ffprobe-installer/ffprobe'
 import { setFfmpegPath, setFfprobePath } from 'fluent-ffmpeg'
+
+const ffmpegOnProgress = require('ffmpeg-on-progress')
+
 const gm = require('gm').subClass({ imageMagick: true })
 const rootPath = _resolve(__dirname, '..')
 
 const fromRoot = relPath => _resolve(rootPath, relPath)
 setFfmpegPath(ffmpegPath)
 setFfprobePath(ffprobePath)
+
+const logProgress = (progress, event) => {
+  // progress is a floating point number from 0 to 1
+  process.stdout.write('\r' + '> [video-robot] Processing: ' + (progress * 100).toFixed() + '% done ')
+}
 
 async function robot () {
   console.log('> [video-robot] Starting...')
@@ -211,6 +219,8 @@ async function robot () {
 
       const images = []
 
+      let estimateTotalTime = 0
+
       for (
         let sentenceIndex = 0;
         sentenceIndex < content.sentences.length;
@@ -224,7 +234,10 @@ async function robot () {
           caption: content.sentences[sentenceIndex].text,
           loop: slideTransition // loop variável de acordo com o tamanho das palavras
         })
+        estimateTotalTime += slideTransition
       }
+
+      estimateTotalTime *= 1000
 
       const videoOptions = {
         fps: 25,
@@ -262,15 +275,16 @@ async function robot () {
         .audio('./templates/1/newsroom.mp3')
         .save(destinationFilePath)
         .on('start', function (command) {
-          console.log('> [video-robot] ffmpeg process started ... ') //, command);
+          console.log('\n> [video-robot] ffmpeg process started ... ') //, command)
         })
+        .on('progress', ffmpegOnProgress(logProgress, estimateTotalTime))
         .on('error', function (err, stdout, stderr) {
-          console.error('> [video-robot] Error:', err)
+          console.error('\n> [video-robot] Error:', err)
           console.error('> [video-robot] ffmpeg stderr:', stderr)
           reject(err)
         })
         .on('end', function (output) {
-          console.error('> [video-robot] Video created in:', output)
+          console.error('\n> [video-robot] Video created in:', output)
           content.videoFilePath = destinationFilePath
           resolve()
         })
