@@ -9,6 +9,7 @@ import { path as ffprobePath } from '@ffprobe-installer/ffprobe'
 import { setFfmpegPath, setFfprobePath } from 'fluent-ffmpeg'
 
 const ffmpegOnProgress = require('ffmpeg-on-progress')
+const opn = require('opn')
 
 const gm = require('gm').subClass({ imageMagick: true })
 const rootPath = _resolve(__dirname, '..')
@@ -21,6 +22,8 @@ const logProgress = (progress, event) => {
   // progress is a floating point number from 0 to 1
   process.stdout.write('\r' + '> [video-robot] Processing: ' + (progress * 100).toFixed() + '% done ')
 }
+
+const readingVelocity = 130
 
 async function robot () {
   console.log('> [video-robot] Starting...')
@@ -219,7 +222,7 @@ async function robot () {
 
       const images = []
 
-      let estimateTotalTime = 0
+      let estimatedVideoTotalTime = 0
 
       for (
         let sentenceIndex = 0;
@@ -227,21 +230,21 @@ async function robot () {
         sentenceIndex++
       ) {
         const slideTransition =
-                    content.sentences[sentenceIndex].wordcount.total * (60 / 130) // Leitura de 100 palavras por minuto
-        console.log(`> [video-robot] DEBUG: loop: ${slideTransition}`)
+                    content.sentences[sentenceIndex].wordcount.total * (60 / readingVelocity)
         images.push({
           path: `./content/${sentenceIndex}-converted.png`,
           caption: content.sentences[sentenceIndex].text,
-          loop: slideTransition // loop variável de acordo com o tamanho das palavras
+          loop: slideTransition,
+          filters: `zoompan=z='min(zoom+0.0015,1.5)':d=${slideTransition * 25}:x='if(gte(zoom,1.5),x,x+1/a)':y='if(gte(zoom,1.5),y,y+1)':s=hd1080`
         })
-        estimateTotalTime += slideTransition
+        estimatedVideoTotalTime += slideTransition
       }
 
-      estimateTotalTime *= 1000
+      estimatedVideoTotalTime *= 1000
 
       const videoOptions = {
         fps: 25,
-        loop: 10, // seconds
+        // loop: 10, // seconds
         transition: true,
         transitionDuration: 1, // seconds
         videoBitrate: 1024,
@@ -277,7 +280,7 @@ async function robot () {
         .on('start', function (command) {
           console.log('\n> [video-robot] ffmpeg process started ... ') //, command)
         })
-        .on('progress', ffmpegOnProgress(logProgress, estimateTotalTime))
+        .on('progress', ffmpegOnProgress(logProgress, estimatedVideoTotalTime))
         .on('error', function (err, stdout, stderr) {
           console.error('\n> [video-robot] Error:', err)
           console.error('> [video-robot] ffmpeg stderr:', stderr)
@@ -286,6 +289,7 @@ async function robot () {
         .on('end', function (output) {
           console.error('\n> [video-robot] Video created in:', output)
           content.videoFilePath = destinationFilePath
+          opn(destinationFilePath)
           resolve()
         })
     })
