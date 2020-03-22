@@ -48,6 +48,9 @@ async function robot () {
       // size: 'large',
       // rights: 'cc_publicdomain,cc_attribute',
       num: 5
+    }).catch(error => {
+      console.log(`> [image-robot] Google's Custom Search Engine Response [${error}]`)
+      throw new Error(error)
     })
 
     const imagesUrl = response.data.items.map((item) => item.link)
