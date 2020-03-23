@@ -20,7 +20,9 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "@ffprobe-installer/ffprobe": "^1.0.12",
+    "@types/duckduckgo-images-api": "^1.0.0",
     "algorithmia": "^0.3.10",
+    "duckduckgo-images-api": "^1.0.4",
     "express": "^4.17.1",
     "ffmpeg-on-progress": "^1.0.0",
     "fluent-ffmpeg": "^2.1.2",
@@ -29,6 +31,7 @@
     "image-downloader": "^3.5.0",
     "node-fetch": "^2.6.0",
     "opn": "^6.0.0",
+    "pixabay-api": "^1.0.4",
     "readline-sync": "^1.4.10",
     "rss-parser": "^3.7.5",
     "sbd": "^1.0.16",

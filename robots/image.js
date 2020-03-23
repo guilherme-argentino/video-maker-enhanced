@@ -4,6 +4,10 @@ import { load, save } from './state.js'
 
 import { apiKey, searchEngineId } from '../credentials/google-search.json'
 
+import { searchImages } from 'pixabay-api'
+
+import * as duckDuckGoImagesApi from 'duckduckgo-images-api'
+
 const customSearch = google.customsearch('v1')
 
 async function robot () {
@@ -33,10 +37,52 @@ async function robot () {
       query = `${content.searchTerm} ${content.sentences[sentenceIndex].keywords[0]}`
     }
     console.log(`> [image-robot] Querying Google Images with: "${query}"`)
-    content.sentences[sentenceIndex].images = await fetchGoogleAndReturnImagesLinks(query)
-    content.sentences[sentenceIndex].googleSearchQuery = query
+    content.sentences[sentenceIndex].images = await fecthAndReturnImagesLinks(query)
+    content.sentences[sentenceIndex].searchQuery = query
 
     return element
+  }
+
+  function fecthAndReturnImagesLinks (query) {
+    const key = 'google'
+    switch (key) {
+      case 'pixabay':
+        return fetchPixabayAndReturnImagesLinks(query)
+
+      case 'ddg':
+        return fetchDuckDuckGoAndReturnImagesLinks(query)
+
+      default:
+        return fetchGoogleAndReturnImagesLinks(query)
+    }
+  }
+
+  async function fetchPixabayAndReturnImagesLinks (query) {
+    const response = await searchImages('2185854-f4e45c480c99e6864e51c5f1b', query, { per_page: 5 })
+      .catch(error => {
+        console.log(`> [image-robot] Pixabay's Image Search Engine Response [${error}]`)
+        throw new Error(error)
+      })
+
+    console.log(JSON.stringify(response))
+
+    const imagesUrl = response.hits.map((item) => item.largeImageURL)
+
+    return imagesUrl
+  }
+
+  async function fetchDuckDuckGoAndReturnImagesLinks (searchTerm) {
+    const response = await duckDuckGoImagesApi.image_search({ query: searchTerm })
+      .catch(error => {
+        console.log(`> [image-robot] DuckDuckGo's Image Search Engine Response [${error}]`)
+        throw new Error(error)
+      })
+
+    console.log(JSON.stringify(response))
+
+    const imagesUrl = response.Results.map((item) => item.FirstURL)
+
+    return imagesUrl
   }
 
   async function fetchGoogleAndReturnImagesLinks (query) {
