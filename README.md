@@ -189,6 +189,6 @@ renomeio o arquivo para **google-youtube.json** e salve dentro da pasta **video-
 ## 1.., 2..., 3... Testando! ##
 Agora dentro da pasta **video-maker-enhanced** você pode abrir o **cmd** ou **powershell** e executar o comando:
 ```
-node index.js
+npm start
 ```
 ![ezgif-5-a906cfcd3fd1](https://user-images.githubusercontent.com/34013325/57246263-33f69b80-7013-11e9-97a1-2f84acf2a7fe.gif)
