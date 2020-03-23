@@ -10,6 +10,7 @@ import { setFfmpegPath, setFfprobePath } from 'fluent-ffmpeg'
 
 const ffmpegOnProgress = require('ffmpeg-on-progress')
 const opn = require('opn')
+const util = require('util')
 
 const gm = require('gm').subClass({ imageMagick: true })
 const rootPath = _resolve(__dirname, '..')
@@ -24,20 +25,32 @@ const logProgress = (progress, event) => {
 }
 
 const readingVelocity = 130
+const frameRate = 25
+const renderingProcess = 'node'
+
+const filters = [
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='if(gte(zoom,1.5),x,x+1)':y='if(gte(zoom,1.5),y,y+1)':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='if(gte(zoom,1.5),x,x-2)':y='if(gte(zoom,1.5),y,y+1)':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='if(gte(zoom,1.5),x,x+1)':y='if(gte(zoom,1.5),y,y-2)':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='if(gte(zoom,1.5),x,x-2)':y='if(gte(zoom,1.5),y,y-2)':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='if(gte(zoom,1.5),x,x-2)':y='y':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='if(gte(zoom,1.5),x,x+1)':y='y':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:y='if(gte(zoom,1.5),y,y-2)':x='x':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:y='if(gte(zoom,1.5),y,y+1)':x='x':s=hd1080:fps=${frameRate}`,
+  `zoompan=z='min(zoom+0.001,1.5)':d=%s:x='x':y='y':s=hd1080:fps=${frameRate}`
+]
 
 async function robot () {
   console.log('> [video-robot] Starting...')
   const content = load()
 
-  await convertAllImages(content)
-  await createAllSentenceImages(content)
+  await convertAllImages()
   await createYouTubeThumbnail()
-  await createAfterEffectsScript(content)
-  await renderVideo('node')
+  await renderVideo(renderingProcess)
 
   save(content)
 
-  async function convertAllImages (content) {
+  async function convertAllImages () {
     const listOfImagesToConvert = []
 
     content.sentences.forEach((element, index) => {
@@ -92,7 +105,7 @@ async function robot () {
     })
   }
 
-  async function createAllSentenceImages (content) {
+  async function createAllSentenceImages () {
     const listOfImagesToConvert = []
 
     content.sentences.forEach((element, index) => {
@@ -171,7 +184,8 @@ async function robot () {
     })
   }
 
-  async function createAfterEffectsScript (content) {
+  async function createAfterEffectsScript () {
+    console.log('> [video-robot] Saving After Effects Script')
     saveScript(content)
   }
 
@@ -218,11 +232,20 @@ async function robot () {
 
   async function renderVideoWithNode () {
     return new Promise((resolve, reject) => {
+      console.log('> [video-robot] Starting Rendering Vídeo')
+
       const destinationFilePath = `${rootPath}/content/output.mp4`
 
       const images = []
 
       let estimatedVideoTotalTime = 0
+
+      // const shuffledFilters = filters
+      //   .map((a) => ({ sort: Math.random(), value: a }))
+      //   .sort((a, b) => a.sort - b.sort)
+      //   .map((a) => a.value)
+
+      const shuffledFilters = shuffle(filters)
 
       for (
         let sentenceIndex = 0;
@@ -235,7 +258,7 @@ async function robot () {
           path: `./content/${sentenceIndex}-converted.png`,
           caption: content.sentences[sentenceIndex].text,
           loop: slideTransition,
-          filters: `zoompan=z='min(zoom+0.0015,1.5)':d=${slideTransition * 25}:x='if(gte(zoom,1.5),x,x+1/a)':y='if(gte(zoom,1.5),y,y+1)':s=hd1080`
+          filters: util.format(shuffledFilters[sentenceIndex], slideTransition * frameRate)
         })
         estimatedVideoTotalTime += slideTransition
       }
@@ -243,8 +266,7 @@ async function robot () {
       estimatedVideoTotalTime *= 1000
 
       const videoOptions = {
-        fps: 25,
-        // loop: 10, // seconds
+        fps: frameRate,
         transition: true,
         transitionDuration: 1, // seconds
         videoBitrate: 1024,
@@ -293,10 +315,30 @@ async function robot () {
           resolve()
         })
     })
+
+    function shuffle (array) {
+      var currentIndex = array.length; var temporaryValue; var randomIndex
+
+      // While there remain elements to shuffle...
+      while (currentIndex !== 0) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex)
+        currentIndex -= 1
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex]
+        array[currentIndex] = array[randomIndex]
+        array[randomIndex] = temporaryValue
+      }
+
+      return array
+    }
   }
 
   async function renderVideo (type) {
     if (type === 'after') {
+      await createAllSentenceImages()
+      await createAfterEffectsScript()
       await renderVideoWithAfterEffects()
     } else {
       await renderVideoWithNode()
