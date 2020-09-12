@@ -27,7 +27,7 @@
     "gm": "^1.23.1",
     "googleapis": "^47.0.0",
     "image-downloader": "^3.5.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "opn": "^6.0.0",
     "readline-sync": "^1.4.10",
     "rss-parser": "^3.7.5",
