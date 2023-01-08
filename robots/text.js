@@ -1,14 +1,18 @@
 import algorithmia from 'algorithmia'
 import { sentences as _sentences } from 'sbd'
-const fetch = require('./fetch')
 import NaturalLanguageUnderstandingV1 from 'watson-developer-cloud/natural-language-understanding/v1.js'
 
 import { apikey as watsonApiKey } from '../credentials/watson-nlu.json'
-import { apiKey as algorithmiaApiKey } from '../credentials/algorithmia.json'
 
 import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
 
 import { load, save } from './state.js'
+
+import WikipediaFactory from './text/fetch-wikipedia'
+//let wikipediaFetcher = WikipediaFactory('Algorithmia')
+let wikipediaFetcher = WikipediaFactory("WikipediaAPI");
+
+const fetch = require("./fetch");
 
 const nlu = new NaturalLanguageUnderstandingV1({
   iam_apikey: watsonApiKey,
@@ -25,7 +29,7 @@ async function robot () {
   console.log('> [text-robot] Starting...')
   const content = load()
 
-  await fetchContentFromWikipedia()
+  await wikipediaFetcher.fetch(content)
   sanitzeContent()
   breakContentIntoSentences()
   limitMaximumSentences()
@@ -33,19 +37,6 @@ async function robot () {
   await fetchGotItAi()
 
   save(content)
-
-  async function fetchContentFromWikipedia () {
-    const algorithmiaAutenticated = algorithmia(algorithmiaApiKey)
-    const wikipediaAlgorithm = algorithmiaAutenticated.algo(
-      'web/WikipediaParser/0.1.2?timeout=300'
-    )
-    const wikipediaResponde = await wikipediaAlgorithm.pipe({
-      lang: content.lang,
-      articleName: content.searchTerm
-    })
-    const wikipediaContent = wikipediaResponde.get()
-    content.sourceContentOriginal = wikipediaContent.content
-  }
 
   function sanitzeContent () {
     const withoutBlankLinesAndMarkdown = removeBlankLinesAndMarkdown(
