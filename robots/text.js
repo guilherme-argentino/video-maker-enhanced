@@ -1,7 +1,7 @@
 import { sentences as _sentences } from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'watson-developer-cloud/natural-language-understanding/v1.js'
 
-import { apikey as watsonApiKey } from '../credentials/watson-nlu.json'
+import { apikey as watsonApiKey, url as watsonUrl } from '../credentials/watson-nlu.json'
 
 import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
 
@@ -16,7 +16,7 @@ const fetch = require('./fetch')
 const nlu = new NaturalLanguageUnderstandingV1({
   iam_apikey: watsonApiKey,
   version: '2018-04-05',
-  url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
+  url: watsonUrl
 })
 
 const gotitailanguages = {
