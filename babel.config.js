@@ -1,6 +1,4 @@
 // babel.config.js
 module.exports = {
-  presets: [
-    'env'
-  ]
-}
+  presets: ["@babel/preset-env"],
+};
