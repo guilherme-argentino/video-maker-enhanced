@@ -1,6 +1,6 @@
 import algorithmia from 'algorithmia'
 import { sentences as _sentences } from 'sbd'
-import fetch from 'node-fetch'
+const fetch = require('./fetch')
 import NaturalLanguageUnderstandingV1 from 'watson-developer-cloud/natural-language-understanding/v1.js'
 
 import { apikey as watsonApiKey } from '../credentials/watson-nlu.json'
