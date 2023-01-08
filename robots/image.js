@@ -8,7 +8,11 @@ import { searchImages } from 'pixabay-api'
 
 import * as duckDuckGoImagesApi from 'duckduckgo-images-api'
 
+import { resolve as _resolve } from 'path'
+
 const customSearch = google.customsearch('v1')
+
+const rootPath = _resolve(__dirname, '..')
 
 async function robot () {
   console.log('> [image-robot] Starting...')
@@ -132,7 +136,7 @@ async function robot () {
   async function downloadAndSave (url, fileName) {
     return image({
       url,
-      dest: `./content/${fileName}`
+      dest: `${rootPath}/content/${fileName}`
     })
   }
 }
