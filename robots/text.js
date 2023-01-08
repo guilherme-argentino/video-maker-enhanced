@@ -1,4 +1,3 @@
-import algorithmia from 'algorithmia'
 import { sentences as _sentences } from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'watson-developer-cloud/natural-language-understanding/v1.js'
 
@@ -9,10 +8,10 @@ import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
 import { load, save } from './state.js'
 
 import WikipediaFactory from './text/fetch-wikipedia'
-//let wikipediaFetcher = WikipediaFactory('Algorithmia')
-let wikipediaFetcher = WikipediaFactory("WikipediaAPI");
+// const wikipediaFetcher = WikipediaFactory('Algorithmia')
+const wikipediaFetcher = WikipediaFactory('WikipediaAPI')
 
-const fetch = require("./fetch");
+const fetch = require('./fetch')
 
 const nlu = new NaturalLanguageUnderstandingV1({
   iam_apikey: watsonApiKey,
