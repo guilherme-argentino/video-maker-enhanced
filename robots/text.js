@@ -8,9 +8,9 @@ import ProcessKeywordsFactory from './text/process-keywords'
 
 const wikipediaFetcher = WikipediaFactory('WikipediaAPI')
 const processSentencesFactory = ProcessSentencesFactory('SbdMethod')
-const processKeywordsFactory = ProcessKeywordsFactory('Skip')
+const processKeywordsFactory = ProcessKeywordsFactory('WatsonMethod')
 
-const fetch = require('./fetch')
+const { default: fetch } = await import('node-fetch')
 
 const gotitailanguages = {
   pt: 'PtBr',
@@ -25,7 +25,7 @@ async function robot () {
   sanitzeContent()
   await processSentencesFactory.breakContentIntoSentences(content)
   limitMaximumSentences()
-  await processKeywordsFactory.fetchKeywordsOfAllSentences()
+  await processKeywordsFactory.fetchKeywordsOfAllSentences(content)
   await fetchGotItAi()
 
   save(content)
