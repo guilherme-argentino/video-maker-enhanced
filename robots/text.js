@@ -1,21 +1,14 @@
-import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
-
 import { load, save } from './state.js'
 
 import WikipediaFactory from './text/fetch-wikipedia'
 import ProcessSentencesFactory from './text/process-sentences'
 import ProcessKeywordsFactory from './text/process-keywords'
-
-const fetch = require('./fetch')
+import ProcessScriptFactory from './text/process-script'
 
 const wikipediaFetcher = WikipediaFactory('WikipediaAPI')
 const processSentencesFactory = ProcessSentencesFactory('SbdMethod')
 const processKeywordsFactory = ProcessKeywordsFactory('WatsonMethod')
-
-const gotitailanguages = {
-  pt: 'PtBr',
-  en: 'EnUs'
-}
+const processScriptFactory = ProcessScriptFactory('GotitAi')
 
 async function robot () {
   console.log('> [text-robot] Starting...')
@@ -26,7 +19,7 @@ async function robot () {
   await processSentencesFactory.breakContentIntoSentences(content)
   limitMaximumSentences()
   await processKeywordsFactory.fetchKeywordsOfAllSentences(content)
-  await fetchGotItAi()
+  await processScriptFactory.processScript(content)
 
   save(content)
 
@@ -61,45 +54,6 @@ async function robot () {
 
   function limitMaximumSentences () {
     content.sentences = content.sentences.slice(0, content.maximumSentences)
-  }
-
-  async function fetchGotItAi () {
-    const body = {
-      T: content.sourceContentSanitized,
-      S: true,
-      EM: true,
-      SL: gotitailanguages[content.lang]
-    }
-    const url = 'https://api.gotit.ai/NLU/v1.4/Analyze'
-    console.log('> [text-robot] Getting feeling from GotIt.Ai')
-    const getData = async (url) => {
-      try {
-        const response = await fetch(url, {
-          method: 'post',
-          body: JSON.stringify(body),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Basic ${gotitaiApiKey}`
-          }
-        })
-
-        const json = await response.json()
-        const arr = Object.values(json.emotions)
-        const max = Math.max(...arr)
-        const emotions = Object.entries(json.emotions).reduce((ret, entry) => {
-          const [key, value] = entry
-          ret[value] = key
-          return ret
-        }, {})
-        content.feeling = emotions[max]
-        console.log(
-          `> [text-robot] the feeling is ${content.feeling}: by GotIt.Ai`
-        )
-      } catch (error) {
-        console.log(`> [text-robot] ${error}`)
-      }
-    }
-    await getData(url)
   }
 }
 
