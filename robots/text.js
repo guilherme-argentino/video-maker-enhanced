@@ -6,11 +6,11 @@ import WikipediaFactory from './text/fetch-wikipedia'
 import ProcessSentencesFactory from './text/process-sentences'
 import ProcessKeywordsFactory from './text/process-keywords'
 
+const fetch = require('./fetch')
+
 const wikipediaFetcher = WikipediaFactory('WikipediaAPI')
 const processSentencesFactory = ProcessSentencesFactory('SbdMethod')
 const processKeywordsFactory = ProcessKeywordsFactory('WatsonMethod')
-
-const fetch = require('./fetch')
 
 const gotitailanguages = {
   pt: 'PtBr',
