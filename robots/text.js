@@ -10,7 +10,7 @@ const wikipediaFetcher = WikipediaFactory('WikipediaAPI')
 const processSentencesFactory = ProcessSentencesFactory('SbdMethod')
 const processKeywordsFactory = ProcessKeywordsFactory('WatsonMethod')
 
-const { default: fetch } = await import('node-fetch')
+const fetch = require('./fetch')
 
 const gotitailanguages = {
   pt: 'PtBr',
