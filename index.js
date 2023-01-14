@@ -12,7 +12,7 @@ async function start () {
   await robots.text()
   await robots.image()
   await robots.video()
-  await robots.youtube()
+  // await robots.youtube()
 }
 
 start()

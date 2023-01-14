@@ -1,0 +1,6 @@
+{ 
+    "maximumSentences": 7 ,
+    "wikipediaFactory": "WikipediaAPI",
+    "processSentencesFactory": "SbdMethod",
+    "processKeywordsFactory": "Skip"
+}

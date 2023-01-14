@@ -1,23 +1,16 @@
-import { sentences as _sentences } from 'sbd'
-import NaturalLanguageUnderstandingV1 from 'watson-developer-cloud/natural-language-understanding/v1.js'
-
-import { apikey as watsonApiKey, url as watsonUrl } from '../credentials/watson-nlu.json'
-
 import { apiKey as gotitaiApiKey } from '../credentials/gotit.ai.json'
 
 import { load, save } from './state.js'
 
 import WikipediaFactory from './text/fetch-wikipedia'
-// const wikipediaFetcher = WikipediaFactory('Algorithmia')
+import ProcessSentencesFactory from './text/process-sentences'
+import ProcessKeywordsFactory from './text/process-keywords'
+
 const wikipediaFetcher = WikipediaFactory('WikipediaAPI')
+const processSentencesFactory = ProcessSentencesFactory('SbdMethod')
+const processKeywordsFactory = ProcessKeywordsFactory('Skip')
 
 const fetch = require('./fetch')
-
-const nlu = new NaturalLanguageUnderstandingV1({
-  iam_apikey: watsonApiKey,
-  version: '2018-04-05',
-  url: watsonUrl
-})
 
 const gotitailanguages = {
   pt: 'PtBr',
@@ -30,9 +23,9 @@ async function robot () {
 
   await wikipediaFetcher.fetch(content)
   sanitzeContent()
-  breakContentIntoSentences()
+  await processSentencesFactory.breakContentIntoSentences(content)
   limitMaximumSentences()
-  await fetchKeywordsOfAllSentences()
+  await processKeywordsFactory.fetchKeywordsOfAllSentences()
   await fetchGotItAi()
 
   save(content)
@@ -64,22 +57,6 @@ async function robot () {
     return text
       .replace(/\((?:\([^()]*\)|[^()])*\)/gm, '')
       .replace(/ {2}/g, ' ')
-  }
-
-  function breakContentIntoSentences () {
-    content.sentences = []
-
-    const sentences = _sentences(
-      content.sourceContentSanitized
-    )
-    sentences.forEach((sentence) => {
-      content.sentences.push({
-        text: sentence,
-        wordcount: countWords(sentence),
-        keywords: [],
-        images: []
-      })
-    })
   }
 
   function limitMaximumSentences () {
@@ -123,67 +100,6 @@ async function robot () {
       }
     }
     await getData(url)
-  }
-
-  async function fetchKeywordsOfAllSentences () {
-    console.log('> [text-robot] Starting to fetch keywords from Watson')
-    const listOfKeywordsToFetch = []
-
-    content.sentences.forEach((element, index, array) => {
-      listOfKeywordsToFetch.push(fetchWatsonAndReturnKeywords(element, index))
-    })
-
-    await Promise.all(listOfKeywordsToFetch)
-  }
-
-  function countWords (sentence) {
-    const index = {
-      total: 0,
-      words: []
-    }
-    const words = sentence
-      .replace(/[.,?!;()"'-]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .toLowerCase()
-      .split(' ')
-
-    words.forEach((word) => {
-      if (!Object.prototype.hasOwnProperty.call(index.words, word)) {
-        index.words[word] = 0
-      }
-      index.words[word]++
-      index.total++
-    })
-
-    return index
-  }
-
-  async function fetchWatsonAndReturnKeywords (sentence, index) {
-    return new Promise((resolve, reject) => {
-      nlu.analyze(
-        {
-          text: sentence.text,
-          features: {
-            keywords: {}
-          }
-        },
-        (error, response) => {
-          if (error) {
-            reject(error)
-            return
-          }
-
-          const keywords = response.keywords.map((keyword) => keyword.text)
-
-          sentence.keywords = keywords
-
-          console.log(`> [text-robot] Sentence [${index}]: "${sentence.text}"`)
-          console.log(`> [text-robot] Keywords [${index}]: ${sentence.keywords.join(', ')}\n`)
-
-          resolve(keywords)
-        }
-      )
-    })
   }
 }
 

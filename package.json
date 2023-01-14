@@ -29,6 +29,7 @@
     "gm": "^1.25.0",
     "googleapis": "^110.0.0",
     "image-downloader": "^4.3.0",
+    "lexrank": "^1.0.5",
     "node-fetch": "^3.3.0",
     "opn": "^6.0.0",
     "pixabay-api": "^1.0.4",

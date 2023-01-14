@@ -3,9 +3,7 @@ import Parser from 'rss-parser'
 import { save } from './state.js'
 
 async function robot () {
-  const content = {
-    maximumSentences: 7
-  }
+  const content = require('../config.json')
 
   const searchTermInputOptions = ['Google Trends', 'Keyboard']
 
