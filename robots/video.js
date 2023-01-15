@@ -193,7 +193,7 @@ async function robot () {
     return new Promise((resolve, reject) => {
       const systemPlatform = platform
 
-      var aerenderFilePath
+      let aerenderFilePath
       if (systemPlatform === 'darwin') {
         aerenderFilePath =
                     '/Applications/Adobe After Effects CC 2019/aerender'
@@ -317,7 +317,7 @@ async function robot () {
     })
 
     function shuffle (array) {
-      var currentIndex = array.length; var temporaryValue; var randomIndex
+      let currentIndex = array.length; let temporaryValue; let randomIndex
 
       // While there remain elements to shuffle...
       while (currentIndex !== 0) {
